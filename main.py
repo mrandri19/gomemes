@@ -56,4 +56,4 @@ def hello():
     return render_template('image.html', data=image_str)
 
 if __name__ == "__main__":
-    app.run()
+    app.run(host="0.0.0.0")
