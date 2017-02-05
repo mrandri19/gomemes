@@ -1,11 +1,12 @@
 from flask import Flask, render_template, request
-from werkzeug.contrib.cache import SimpleCache
+from functools import lru_cache
 
 from PIL import ImageFont, Image, ImageDraw
 
 import base64
 from io import BytesIO
 
+@lru_cache(maxsize=1024)
 def write_on_image(text):
     img = Image.open("go_template.jpg")
     draw = ImageDraw.Draw(img)
@@ -21,7 +22,6 @@ def write_on_image(text):
 
 app = Flask(__name__)
 
-cache = SimpleCache()
 
 @app.route("/")
 def hello():
@@ -55,14 +55,7 @@ def image():
     text = "\n".join(text_tmp)
     # 8x32 monospace go-mono.ttf with size 20
 
-    if cache.get(text):
-       print("Used cached value")
-       return render_template('image.html', data=cache.get(text)) 
-
     image_str = write_on_image(text).decode()
-
-    print("added to cache")
-    cache.set(text, image_str)
 
     return render_template('image.html', data=image_str)
 
